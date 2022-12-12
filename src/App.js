@@ -1,24 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import { Form, Container, Row } from "react-bootstrap";
+import "./App.css";
+import { useEffect, useState } from "react";
 
 function App() {
+  const [ver, setVer] = useState(0)
+  const [seed,setSeed] = useState(0)
+  const [conta,setConta] = useState(0)
+  const [stocuri,setStocuri] = useState(0)
+  const calculateKey = (pcodcd, plver, plprg, mcodn) => {
+    const mlcod = pcodcd.substring(0,6).split('').reduce((result, current,index)=>{return result + current.charCodeAt()*(index+1)},0) + mcodn * plver + plprg.charCodeAt()
+    return parseInt((Math.sqrt(mlcod*Math.sqrt(mlcod))% 1)*1000000)
+  }
+  const verHandler = (e)=>{
+      setVer(e.target.value)
+    }
+  const seedHandler = (e)=>{
+      setSeed(e.target.value)
+    }
+  useEffect(()=>{
+        if (!!seed && !!ver  ) {
+          setConta(calculateKey(seed,ver,"C",6))
+          setStocuri(calculateKey(seed,ver,"S",6))
+        }
+  },[ver,seed])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Row>
+        <Form>
+          <Form.Group className="mb-3" controlId="formVer">
+            <Form.Label>Versiune</Form.Label>
+            <Form.Control type="text" placeholder="ex: 553" onChange={verHandler} />
+            <Form.Text className="text-muted">
+              Ultimele 3 cifre din versiune.
+            </Form.Text>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="formSeed">
+            <Form.Label>Codul de identificare</Form.Label>
+            <Form.Control type="text" placeholder="ex: 000A3945" onChange={seedHandler} />
+            <Form.Text className="text-muted">
+              Codul scris cu majuscule si fara spatii
+            </Form.Text>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="CodactivareConta">
+            <Form.Label>Cod activare Conta</Form.Label>
+            <Form.Control type="text" value={conta} readOnly />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="CodactivareConta">
+            <Form.Label>Cod activare stocuri</Form.Label>
+            <Form.Control type="text" value={stocuri} readOnly />
+          </Form.Group>
+        </Form>
+      </Row>
+    </Container>
   );
 }
 
